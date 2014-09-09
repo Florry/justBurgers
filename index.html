@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Just Burgers</title>
+  <style>
+  body {
+    background-color: #aee8aa;
+    width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+canvas{
+    background-color: #aee8fe;
+    border: solid 1px black;
+    background: #7abcff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #7abcff 0%, #aee8fe 74%, #00a653 82%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7abcff), color-stop(74%,#aee8fe), color-stop(82%,#00a653)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #7abcff 0%,#aee8fe 74%,#00a653 82%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #7abcff 0%,#aee8fe 74%,#00a653 82%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #7abcff 0%,#aee8fe 74%,#00a653 82%); /* IE10+ */
+    background: linear-gradient(to bottom,  #7abcff 0%,#aee8fe 74%,#00a653 82%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#00a653',GradientType=0 ); /* IE6-9 */
+
+    
+    cursor: default;
+}
+.grid{
+    background-image: url(assets/grid01.png);
+    background-color: #aee8fe;
+}
+.frameRate{
+    background-color: black;
+    color: white;
+    padding: 10px;
+}
+#globalOffset{
+    display:hidden;
+}
+.container{
+    width: 850px;
+}
+.hpStyle{
+    float: right;
+}
+.dead, .pausedText{
+    widht: 100%;
+    height: auto;
+    position: fixed;
+    background-color: white;
+    border: solid 1px #000;
+    padding: 10px;
+    font-size: 30px;
+    display: none;
+}
+
+.block, .block2{
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    cursor: pointer;
+    background-size: 32px;
+    border: 1px solid black;
+}
+#block1{
+    background-image: url(assets/blocks/block01.png);
+}
+#block2{
+    background-image: url(assets/blocks/block01Beach.png);
+}
+#block3{
+    background-image: url(assets/blocks/block01Green.png);
+}
+#block4{
+    background-image: url(assets/blocks/block01White.png);
+}
+#block5{
+    background-image: url(assets/blocks/grass01.png);
+}
+#block6{
+    background-image: url(assets/blocks/dirt01.png);
+}
+#block7{
+    background-image: url(assets/blocks/dirt01Mossy.png);
+}
+#block12{
+    background-image: url(assets/blocks/dirt01MossyNoTop.png);
+}
+#block8{
+    background-image: url(assets/blocks/box01.png);
+}
+#block9{
+    background-image: url(assets/blocks/burger01.png);
+}
+#block10{
+    background-image: url(assets/blocks/blockade01.png);
+}
+#block11{
+    background-image: url(assets/blocks/vegetation/grass01.png);
+}
+#block13{
+    background-image: url(assets/blocks/vegetation/tree01.png);
+}
+
+#decor, #level, #entity{
+    font-size: 12px;
+    padding-left: 4px;
+    background-color: cornsilk;
+    width: 32px;
+    height: 32px;
+}
+
+.selected{
+    border: solid 2px red;
+}
+.selectedSmall{
+    border: solid 1px red;
+}
+
+#jsonInput{
+    width: auto;
+    height: auto;
+    border: solid 1px black;
+    background-color: #bbb8aa;
+}
+
+#brushSizeY, #brushSizeX, #distance{
+    width: 50px;
+}
+
+</style>
+</head>
+<body>
+    <div class="dead">You are dead!<br/>     <input type="button" value="Retry" id="clear2"></input></div>
+    <div class="pausedText">Game is paused!</div>
+    <div class="container"><div class="background"></div>
+    <canvas></canvas><br/>
+    <input type="button" value="toggle editor" id="debug""></input>        
+    <input type="button" value="Pause" id="pauseButton"></input>
+    <p style="float:left;">FPS: <span class="frameRate">0</span></p><br/>
+    <p class="hpStyle"><span class="hp">100</span> HP </p></div>
+    <div class="debug">
+        <input type="button" value="spawn entity" id="spawn"></input>
+        <input type="button" value="spam entities" id="spam"></input>
+        <input type="button" value="clear entities" id="clear"></input>
+        <input type="button" value="<- undo" id="undo"></input>
+        <input type="button" value="redo ->" id="redo"></input>
+        <input type="button" value="<-- clear undo history ->" id="clearDo"></input>
+        <input type="button" value="remover" id="remover"></input>
+        <input type="button" value="NOCLIP" id="noclip"></input>
+
+        <br/>
+        Size: Y: <input type="number" value="1" max="8" id="brushSizeY" min="1"> X:
+        <input type="number" value="1" id="brushSizeX" min="1"  max="8">
+        Distance: <input type="number" value="1" min="0" id="distance"></input>
+        <input type="button" value="toggle brush" id="gridBrush"></input>
+        <input type="button" value="toggle grid" id="grid"></input>
+
+        <br/>
+
+
+        <div class="block selected" id="block1"></div>
+        <div class="block" id="block2"></div>
+        <div class="block" id="block3"></div>
+        <div class="block" id="block4"></div>
+        <div class="block" id="block6"></div>
+        <div class="block" id="block7"></div>
+        <div class="block" id="block12"></div>
+        <div class="block" id="block5"></div>
+        <div class="block" id="block8"></div>
+        <div class="block" id="block9"></div>
+        <div class="block" id="block10"></div>
+        <div class="block" id="block11"></div>
+        <div class="block" id="block13"></div>
+        <div class="block" id="block14"></div>
+        <input type="text" value="custom block" id="custom"></input>
+
+        <div class="block2 selected" id="level" title="level">Level</div>
+        <div class="block2" id="decor" title="decor">Decor</div>
+        <div class="block2" id="entity" title="entity">entity</div>
+        <br/>
+
+</div>
+
+                <input type="button" value="save level" id="save"></input>
+        <input type="button" value="clear level" class="clear"></input>
+        <input type="button" value="load level" id="load"></input>
+        <input type="file" id="jsonInput" value=""></input><br/>
+        <p>Number of blocks being rendered: <span class="numberBlocks">0</span></p>
+        <p>Number of entities being rendered: <span class="numberEntities">0</span></p>
+
+
+        <div id="myDiv"></div>
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="js/sidescroller.js"></script>
+        <script src="js/sidescroller.entity.js"></script>
+        <script src="js/sidescroller.level1.js"></script>
+        <script src="js/sidescroller.level2.js"></script>
+        <script src="js/sidescroller.weapon.js"></script>
+        <script src="js/sidescroller.block.js"></script>
+        <script src="js/sidescroller.vegetation.js"></script>
+        <!---<div class="ground">
+        <div class="grass"></div>
+        <div class="moss"></div>
+    </div>---->
+
+</body>
+</html>
