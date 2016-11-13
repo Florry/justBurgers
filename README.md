@@ -1,4 +1,4 @@
-*Note: This code is several years old and does not fully represent my current level of programming. *
+* Note: This code is several years old and does not fully represent my current level of programming. *
 
 justBurgers
 ===========
